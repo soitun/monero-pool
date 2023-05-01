@@ -53,22 +53,30 @@ is_hex_string(const char *str)
     return 0;
 }
 
+static const int h2d[256] = {
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
+    -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, 10, 11, 12, 13, 14, 15, -1
+};
+
 void
-hex_to_bin(const char *hex, const size_t hex_len,
-        unsigned char *bin, const size_t bin_size)
+hex_to_bin(const char *hex, unsigned char *bin, const size_t bin_size)
 {
     const char *ph = hex;
     unsigned char *end = bin + bin_size;
     while (*ph && bin < end)
     {
-        sscanf(ph, "%2hhx", bin++);    
-        ph += 2;
+        *bin = (h2d[(uint8_t)*ph++] & 0xF) << 4;
+        *bin++ |= (h2d[(uint8_t)*ph++] & 0xF);
     }
 }
 
 void
-bin_to_hex(const unsigned char *bin, const size_t bin_size,
-        char *hex, const size_t hex_size)
+bin_to_hex(const unsigned char *bin, const size_t bin_size, char *hex)
 {
     const char *hex_chars = "0123456789abcdef";
     char *ph = hex;
